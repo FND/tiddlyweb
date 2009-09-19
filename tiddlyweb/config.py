@@ -151,7 +151,7 @@ DEFAULT_CONFIG = {
         'system_plugins': [],
         'twanager_plugins': [],
         'instance_tiddlers': [ ],
-        'server_store': ['text', {'store_root': 'store'}],
+        'server_store': ['text', {}],
         'server_request_filters': [
             Query,
             StoreSet,

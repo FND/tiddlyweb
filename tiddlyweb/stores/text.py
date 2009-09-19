@@ -36,7 +36,7 @@ class Store(StorageInterface):
         super(Store, self).__init__(environ)
         self.serializer = Serializer('text')
         store_config = self.environ['tiddlyweb.config']['server_store'][1]
-        self._root = store_config['store_root']
+        self._root = store_config.get('store_root', 'store')
         self._init_store()
 
     def _init_store(self):
