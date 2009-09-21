@@ -37,6 +37,13 @@ class Recipe(list):
         self.store = None
         self.policy = Policy()
 
+    def __repr__(self):
+        """
+        Make the printed recipe include the name so we
+        can distinguish between them while debugging.
+        """
+        return self.name + object.__repr__(self)
+
     def set_recipe(self, recipe_list):
         """
         Set the contents of the list.
