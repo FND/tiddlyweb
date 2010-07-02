@@ -26,9 +26,12 @@ def base(environ, start_response):
     challenger_info = []
     for system in auth_systems:
         uri = _challenger_url(environ, system)
-        challenger = _determine_challenger(environ, system) # XXX: leads to failing tests
-        label = getattr(challenger, 'desc', uri)
-        challenger_info.append((uri, label))
+        try:
+            challenger = _get_challenger_module(system)
+            label = getattr(challenger, 'desc', uri)
+            challenger_info.append((uri, label))
+        except ImportError:
+            pass
 
     return ['<li><a href="%s">%s</a></li>' % (uri, label) for uri, label in
         challenger_info]
@@ -72,13 +75,19 @@ def _determine_challenger(environ, challenger_name=None):
     if challenger_name not in environ['tiddlyweb.config']['auth_systems']:
         raise HTTP404('Challenger Not Found')
     try:
+        return _get_challenger_module(challenger_name)
+    except ImportError, exc:
+        raise HTTP404('Unable to import challenger %s: %s' %
+            (challenger_name, exc))
+
+
+def _get_challenger_module(challenger_name):
+    """
+    Return given challenger's module, importing it as necessary.
+    """
+    try:
         imported_module = __import__('tiddlyweb.web.challengers.%s' %
             challenger_name, {}, {}, ['Challenger'])
     except ImportError:
-        try:
-            imported_module = __import__(challenger_name, {}, {},
-                ['Challenger'])
-        except ImportError, exc:
-            raise HTTP404('Unable to import challenger %s: %s' %
-                (challenger_name, exc))
+        imported_module = __import__(challenger_name, {}, {}, ['Challenger'])
     return imported_module.Challenger()
