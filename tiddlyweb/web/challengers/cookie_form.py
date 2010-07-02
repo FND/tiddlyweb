@@ -18,6 +18,7 @@ class Challenger(ChallengerInterface):
     database. If it is good, a cookie is sent to the client which
     is later used by the simple_cookie credentials extractor.
     """
+    desc = "username / password"
 
     def challenge_get(self, environ, start_response):
         """

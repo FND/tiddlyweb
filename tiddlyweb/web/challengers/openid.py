@@ -31,6 +31,7 @@ class Challenger(ChallengerInterface):
     to the browser which is later used by the simple_cookie
     credential extractor.
     """
+    desc = "OpenID"
 
     def challenge_get(self, environ, start_response):
         """

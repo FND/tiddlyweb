@@ -22,8 +22,16 @@ def base(environ, start_response):
         raise HTTP302(_challenger_url(environ, auth_systems[0]))
     start_response('401 Unauthorized', [('Content-Type', 'text/html')])
     environ['tiddlyweb.title'] = 'Login Challengers'
-    return ['<li><a href="%s">%s</a></li>' % (uri, uri) for uri in
-        [_challenger_url(environ, system) for system in auth_systems]]
+
+    challenger_info = []
+    for system in auth_systems:
+        uri = _challenger_url(environ, system)
+        challenger = _determine_challenger(environ, system) # XXX: leads to failing tests
+        label = getattr(challenger, 'desc', uri)
+        challenger_info.append((uri, label))
+
+    return ['<li><a href="%s">%s</a></li>' % (uri, label) for uri, label in
+        challenger_info]
 
 
 def challenge_get(environ, start_response):
@@ -53,12 +61,12 @@ def _challenger_url(environ, system):
     return '%s/challenge/%s%s' % (server_base_url(environ), system, redirect)
 
 
-def _determine_challenger(environ):
+def _determine_challenger(environ, challenger_name=None):
     """
-    Determine which challenger we are using and import it
-    as necessary.
+    Determine which challenger we are using and import it as necessary.
     """
-    challenger_name = environ['wsgiorg.routing_args'][1]['challenger']
+    if challenger_name is None:
+        challenger_name = environ['wsgiorg.routing_args'][1]['challenger']
     # If the challenger is not in config, do a 404, we don't want
     # to import any old code.
     if challenger_name not in environ['tiddlyweb.config']['auth_systems']:
