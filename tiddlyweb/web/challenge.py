@@ -34,7 +34,7 @@ def base(environ, start_response):
             pass
 
     return ['<li><a href="%s">%s</a></li>' % (uri, label) for uri, label in
-        challenger_info]
+            challenger_info]
 
 
 def challenge_get(environ, start_response):
@@ -59,7 +59,7 @@ def _challenger_url(environ, system):
     """
     default_redirect = '%s/' % environ['tiddlyweb.config']['server_prefix']
     redirect = (environ['tiddlyweb.query'].get('tiddlyweb_redirect',
-        [default_redirect])[0])
+            [default_redirect])[0])
     redirect = '?tiddlyweb_redirect=%s' % urllib.quote(redirect, safe='')
     return '%s/challenge/%s%s' % (server_base_url(environ), system, redirect)
 
@@ -78,7 +78,7 @@ def _determine_challenger(environ, challenger_name=None):
         return _get_challenger_module(challenger_name)
     except ImportError, exc:
         raise HTTP404('Unable to import challenger %s: %s' %
-            (challenger_name, exc))
+                (challenger_name, exc))
 
 
 def _get_challenger_module(challenger_name):
@@ -87,7 +87,7 @@ def _get_challenger_module(challenger_name):
     """
     try:
         imported_module = __import__('tiddlyweb.web.challengers.%s' %
-            challenger_name, {}, {}, ['Challenger'])
+                challenger_name, {}, {}, ['Challenger'])
     except ImportError:
         imported_module = __import__(challenger_name, {}, {}, ['Challenger'])
     return imported_module.Challenger()
